@@ -49,24 +49,22 @@ internal fun deviceStatusFromJs(raw: JsAny?): DeviceStatus? {
 internal fun evenHubEventFromJs(raw: JsAny?): EvenHubEvent? {
     if (raw == null) return null
     
-    // 新的结构：{ listEvent?, textEvent?, sysEvent?, jsonData? }
-    // 直接检查各个事件属性是否存在
+    // 新的结构：{ listEvent?, textEvent?, sysEvent?, audioEvent?, jsonData? }
     val listEventRaw = JsInteropUtils.getProperty(raw, "listEvent")
     val textEventRaw = JsInteropUtils.getProperty(raw, "textEvent")
     val sysEventRaw = JsInteropUtils.getProperty(raw, "sysEvent")
+    val audioEventRaw = JsInteropUtils.getProperty(raw, "audioEvent")
     val jsonDataRaw = JsInteropUtils.getProperty(raw, "jsonData")
     
-    // 解析各个事件对象
     val listEvent = if (listEventRaw != null) listItemEventFromJs(listEventRaw) else null
     val textEvent = if (textEventRaw != null) textItemEventFromJs(textEventRaw) else null
     val sysEvent = if (sysEventRaw != null) sysItemEventFromJs(sysEventRaw) else null
+    val audioEvent = if (audioEventRaw != null) audioEventFromJs(audioEventRaw) else null
     
-    // 将 jsonData 转换为字符串（如果存在）
     val jsonData = if (jsonDataRaw != null) {
         JsInteropUtils.stringify(jsonDataRaw)
     } else {
-        // 如果没有 jsonData，但至少有一个事件，则序列化整个对象作为 jsonData
-        if (listEvent != null || textEvent != null || sysEvent != null) {
+        if (listEvent != null || textEvent != null || sysEvent != null || audioEvent != null) {
             JsInteropUtils.stringify(raw)
         } else {
             null
@@ -77,8 +75,57 @@ internal fun evenHubEventFromJs(raw: JsAny?): EvenHubEvent? {
         listEvent = listEvent,
         textEvent = textEvent,
         sysEvent = sysEvent,
+        audioEvent = audioEvent,
         jsonData = jsonData,
     )
+}
+
+/**
+ * 从 JS 解析音频事件 payload。
+ * 兼容：audioPcm 为 number[]、Uint8Array 或 base64 字符串（与 SDK AudioEventPayload 一致）。
+ */
+internal fun audioEventFromJs(raw: JsAny?): AudioEventPayload? {
+    if (raw == null) return null
+    val pcmRaw = JsInteropUtils.getProperty(raw, "audioPcm")
+        ?: JsInteropUtils.getProperty(raw, "audio_pcm")
+        ?: JsInteropUtils.getProperty(raw, "pcm")
+    val bytes = parseAudioPcmToIntList(pcmRaw) ?: return null
+    return AudioEventPayload(audioPcm = bytes)
+}
+
+/**
+ * 将宿主下发的 audioPcm 转为 List<Int>。
+ * 兼容：number[]、Uint8Array（length + [i]）、base64 字符串。
+ */
+private fun parseAudioPcmToIntList(raw: JsAny?): List<Int>? {
+    if (raw == null) return null
+    // Uint8Array / number[]：有 length 且可下标访问（含 TypedArray，isArray 可能为 false）
+    var length = JsInteropUtils.getArrayLength(raw)
+    if (length <= 0) {
+        val lengthProp = JsInteropUtils.toIntOrNull(JsInteropUtils.getProperty(raw, "length"))
+        if (lengthProp != null && lengthProp > 0) length = lengthProp
+    }
+    if (length > 0) {
+        val list = mutableListOf<Int>()
+        for (i in 0 until length) {
+            val el = JsInteropUtils.getArrayElement(raw, i) ?: JsInteropUtils.getProperty(raw, i.toString())
+            list.add(JsInteropUtils.toIntOrNull(el)?.and(0xff) ?: 0)
+        }
+        return list
+    }
+    // base64 字符串
+    val str = JsInteropUtils.toStringOrNull(raw)
+    if (!str.isNullOrEmpty()) {
+        return try {
+            @Suppress("UNCHECKED_CAST")
+            val atob = js("(function(s){ return atob(s); })") as (String) -> String
+            val binary = atob(str)
+            binary.map { it.code and 0xff }
+        } catch (_: Throwable) {
+            null
+        }
+    }
+    return null
 }
 
 /**

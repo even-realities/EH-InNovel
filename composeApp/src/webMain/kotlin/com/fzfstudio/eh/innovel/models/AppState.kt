@@ -30,6 +30,8 @@ data class AppUiState(
     val errorMessage: String? = null,
     /** 是否在大屏阅读 */
     val isFullScreenReading: Boolean = false,
+    /** 音频事件展示行（Test Audio 用，最近 N 条） */
+    val audioEventDisplayLines: List<String> = emptyList(),
 )
 
 /**
@@ -148,13 +150,39 @@ class AppState {
                         println("[EvenHubEvent] SysItemEvent - EventType: ${sysEvent.eventType}")
                         handleSysItemEvent(sysEvent)
                     }
+                    event.audioEvent != null -> {
+                        val audioEvent = event.audioEvent
+                        appendAudioEventDisplay(audioEvent)
+                    }
                     else -> {
-                        // 如果所有事件都为空，打印调试信息
                         println("[EvenHubEvent] No event data found. jsonData: ${event.jsonData}")
                     }
                 }
             }
         }
+    }
+    
+    /** 音频事件展示行最大条数 */
+    private val maxAudioEventDisplayLines = 100
+    
+    /**
+     * 将收到的音频事件转成展示文本并追加到 UI 状态。
+     */
+    private fun appendAudioEventDisplay(payload: AudioEventPayload) {
+        val pcm = payload.audioPcm
+        val len = pcm.size
+        val previewBytes = 32
+        val hexPreview = pcm.take(previewBytes).joinToString(" ") { b ->
+            (b and 0xff).toString(16).padStart(2, '0').uppercase()
+        }
+        val line = if (len <= previewBytes) {
+            "PCM 长度: $len，hex: $hexPreview"
+        } else {
+            "PCM 长度: $len，前 $previewBytes 字节 hex: $hexPreview …"
+        }
+        uiState = uiState.copy(
+            audioEventDisplayLines = (uiState.audioEventDisplayLines + line).takeLast(maxAudioEventDisplayLines)
+        )
     }
     
     /**

@@ -2,23 +2,27 @@ package com.fzfstudio.eh.innovel.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fzfstudio.eh.innovel.models.AppUiState
 import com.fzfstudio.eh.innovel.models.BookModel
+import com.fzfstudio.eh.innovel.sdk.ShutDownContainer
 import com.fzfstudio.eh.innovel.views.ReadingDialog
-import kotlinx.coroutines.coroutineScope
+import com.fzfstudio.eh.innovel.sdk.shutDownPageContainer
 import kotlinx.coroutines.launch
 
 /**
@@ -78,9 +82,45 @@ fun AppScreen(
                 )
             }
         }
-        // Test Image
-        TextImageView()
-        
+
+        // Test Panel：集中放置各 Test 视图
+        Text(
+            text = "Test Panel",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            TextImageView()
+            TextAudioView(displayLines = uiState.audioEventDisplayLines)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 退出按钮：固定在页面最下方，便于退出，不属于任何 Test 视图
+        val coroutineScope = rememberCoroutineScope()
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                coroutineScope.launch {
+                    try {
+                        val success = shutDownPageContainer(ShutDownContainer(exitMode = 0))
+                        if (success) {
+                            println("EvenHub exited successfully")
+                        } else {
+                            println("Failed to exit EvenHub")
+                        }
+                    } catch (e: Exception) {
+                        println("Error on exit: ${e.message}")
+                        e.printStackTrace()
+                    }
+                }
+            }
+        ) {
+            Text("退出 EvenHub")
+        }
     }
     val currentBook = readingBook.value
     if (currentBook != null) {

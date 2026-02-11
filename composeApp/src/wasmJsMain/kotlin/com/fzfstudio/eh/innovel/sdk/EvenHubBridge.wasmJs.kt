@@ -63,6 +63,11 @@ actual suspend fun shutDownPageContainer(container: ShutDownContainer): Boolean 
     return jsToBoolOrNull(result) ?: false
 }
 
+actual suspend fun audioControl(isOpen: Boolean): Boolean {
+    val result = callEvenAppJson("audioControl", "{\"isOpen\":$isOpen}")
+    return jsToBoolOrNull(result) ?: false
+}
+
 actual fun observeDeviceStatus(onChange: (DeviceStatus?) -> Unit): () -> Unit =
     EvenAppBridge.getInstance().onDeviceStatusChanged { status ->
         onChange(deviceStatusFromJs(status))

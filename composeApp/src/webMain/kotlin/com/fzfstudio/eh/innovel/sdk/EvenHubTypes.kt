@@ -158,6 +158,15 @@ data class SysItemEvent(
 )
 
 /**
+ * 音频事件 payload：宿主通过 onAudioData 推送的 PCM 字节码。
+ * 与 @evenrealities/even_hub_sdk 的 AudioEventPayload 对齐。
+ */
+data class AudioEventPayload(
+    /** PCM 原始字节（0–255） */
+    val audioPcm: List<Int>,
+)
+
+/**
  * EvenHub 发出的事件。
  * 
  * 新的结构直接包含解析后的事件对象，而不是原始的 JSON 字符串。
@@ -170,6 +179,8 @@ data class EvenHubEvent(
     val textEvent: TextItemEvent? = null,
     /** 系统事件（如果存在） */
     val sysEvent: SysItemEvent? = null,
+    /** 音频事件（PCM 字节码，如果存在） */
+    val audioEvent: AudioEventPayload? = null,
     /** 原始 JSON 数据（可选，便于调试/回放） */
     val jsonData: String? = null,
 )

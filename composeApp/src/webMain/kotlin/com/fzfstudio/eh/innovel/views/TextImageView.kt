@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 import kotlin.js.js
 
 /**
- * 文本图片视图组件
- * 包含一个可调整大小的画布用于绘制立体长方形，以及测试和退出按钮
+ * 文本图片测试视图组件
+ * 包含可调整宽高的画布（立体长方形预览）、测试上传按钮
  */
 @Composable
 fun TextImageView() {
@@ -159,18 +159,6 @@ fun TextImageView() {
             }
         ) {
             Text("测试上传 (${width}x${height})")
-        }
-        
-        // 退出按钮
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                coroutineScope.launch {
-                    handleExitButtonClick()
-                }
-            }
-        ) {
-            Text("退出 EvenHub")
         }
     }
 }
@@ -373,19 +361,3 @@ private fun draw3DRectangleOnCanvas(
     fillRect(ctx, (rectX + rectWidth - depth).toDouble(), rectY.toDouble(), depth.toDouble(), rectHeight.toDouble())
 }
 
-/**
- * 处理退出按钮点击事件
- */
-private suspend fun handleExitButtonClick() {
-    try {
-        val success = shutDownPageContainer(ShutDownContainer(exitMode = 0))
-        if (success) {
-            println("EvenHub exited successfully")
-        } else {
-            println("Failed to exit EvenHub")
-        }
-    } catch (e: Exception) {
-        println("Error in handleExitButtonClick: ${e.message}")
-        e.printStackTrace()
-    }
-}

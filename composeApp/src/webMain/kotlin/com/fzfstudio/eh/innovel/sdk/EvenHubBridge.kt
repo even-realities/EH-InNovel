@@ -69,6 +69,13 @@ expect suspend fun textContainerUpgrade(container: TextContainerUpgrade): Boolea
 expect suspend fun shutDownPageContainer(container: ShutDownContainer): Boolean
 
 /**
+ * 音频控制（MIC 控制）
+ * @param isOpen true=打开麦克风，false=关闭麦克风
+ * @return 是否成功
+ */
+expect suspend fun audioControl(isOpen: Boolean): Boolean
+
+/**
  * 监听设备状态变化
  * @param onChange 状态变化时的回调函数，参数为完整的设备状态对象
  * @return 取消监听的函数
