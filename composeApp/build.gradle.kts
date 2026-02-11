@@ -53,8 +53,8 @@ kotlin {
         val webMain by creating {
             dependsOn(commonMain)
             dependencies {
-                // 使用 npm 包 @evenrealities/even_hub_sdk
-                implementation(npm("@evenrealities/even_hub_sdk", "^0.0.6"))
+                // 使用本地 Even Hub SDK（dev/localsdk 分支）
+                implementation(npm("@evenrealities/even_hub_sdk", "file:/Users/whiskee/Workspace/EvenGlass/App_New/plugins/even_hub_sdk"))
                 // 协程库用于 Promise await
                 implementation(libs.kotlinx.coroutines.core)
             }

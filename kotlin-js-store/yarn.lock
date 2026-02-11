@@ -12,10 +12,8 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.6.3.tgz#f13c7c205915eb91ae54c557f5e92bddd8be0e83"
   integrity sha512-4B4OijXeVNOPZlYA2oEwWOTkzyltLao+xbotHQeqN++Rv27Y6s818+n2Qkp8q+Fxhn0t/5lA5X1Mxktud8eayQ==
 
-"@evenrealities/even_hub_sdk@^0.0.6":
+"@evenrealities/even_hub_sdk@file:../../../../../EvenGlass/App_New/plugins/even_hub_sdk":
   version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@evenrealities/even_hub_sdk/-/even_hub_sdk-0.0.6.tgz#7fbd71864a1c714af019d8e2f0d7266b990000b2"
-  integrity sha512-rPwoSef8d3Eld3OyEyzXd536ol42DOjrYkxJUWc0C0htJ3GD1GEhqdSVQtPg46tzU4My3F7zwSzUcvsD/5r0Cw==
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
