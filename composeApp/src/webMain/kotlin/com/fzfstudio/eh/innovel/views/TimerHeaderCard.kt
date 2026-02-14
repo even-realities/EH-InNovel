@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -21,58 +20,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.fzfstudio.eh.innovel.sdk.UserInfo
 
-/**
- * 用户书架信息卡片组件。
- * 用于显示用户的头像与书架标题。
- *
- * @param modifier 修饰符
- * @param userInfo 用户信息数据模型
- */
 @Composable
-fun UserBookshelfCard(
+fun TimerHeaderCard(
     modifier: Modifier = Modifier,
     userInfo: UserInfo?,
 ) {
-    val displayName = userInfo?.name ?: "我"
+    val displayName = userInfo?.name ?: "User"
     val avatarLabel = displayName.take(1)
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
-        )
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = avatarLabel,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
                 Text(
-                    text = "${displayName}的书架",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "Pomodoro Timer",
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
             Text(
-                text = "图书列表信息",
+                text = "Focus with your glasses",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

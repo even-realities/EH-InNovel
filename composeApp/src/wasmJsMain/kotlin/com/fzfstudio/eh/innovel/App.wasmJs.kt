@@ -42,8 +42,7 @@ private fun formatKnownModel(obj: Any?): String {
             "isInCase" to obj.isInCase,
         )
         is EvenHubEvent -> jsonObject(
-            "type" to obj.type,
-            "json" to JsonRaw(obj.json),
+            "jsonData" to obj.jsonData,
         )
         else -> {
             val jsObj = obj as? JsAny

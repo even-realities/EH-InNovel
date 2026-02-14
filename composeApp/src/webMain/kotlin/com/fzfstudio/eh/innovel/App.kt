@@ -27,18 +27,14 @@ import kotlin.js.ExperimentalWasmJsInterop
 @Composable
 fun App() {
     InNovelTheme {
-        // 应用状态
         val appState = remember { AppState() }
-        // UI 状态
         val uiState = appState.uiState
-        // 协程作用域，用于调用 suspend 函数
         val coroutineScope = rememberCoroutineScope()
-        // 初始化桥接并获取数据
-        // 注意：设备状态监听和 EvenHubEvent 监听已在 AppState.initialize() 中设置
+
         LaunchedEffect(Unit) {
             appState.initialize()
         }
-        //
+
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -56,18 +52,13 @@ fun App() {
             } else {
                 AppScreen(
                     uiState = uiState,
-                    onStartReading = { book ->
-                        // 在协程作用域中调用 suspend 函数
-                        coroutineScope.launch {
-                            appState.startReadingBook(book)
-                        }
+                    onSelectPreset = { appState.selectPreset(it) },
+                    onStart = { appState.startTimer() },
+                    onPause = { appState.pauseTimer() },
+                    onReset = { appState.resetTimer() },
+                    onExit = {
+                        coroutineScope.launch { appState.exitTimer() }
                     },
-                    onExitReading = {
-                        // 在协程作用域中调用 suspend 函数
-                        coroutineScope.launch {
-                            appState.exitReading()
-                        }
-                    }
                 )
             }
         }

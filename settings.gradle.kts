@@ -1,4 +1,4 @@
-rootProject.name = "InNovel"
+rootProject.name = "PomodoroTimer"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
