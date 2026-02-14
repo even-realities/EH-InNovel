@@ -1,11 +1,11 @@
 {
-  "package_id": "com.fzfstudio.",
+  "package_id": "com.fzfstudio.pomodoro",
   "edition": "202601",
-  "name": "InNovel",
+  "name": "Pomodoro Timer",
   "version": "0.1.0",
   "min_app_version": "0.1.0",
-  "tagline": "An immersive novel reader",
-  "description": "An immersive novel reader",
+  "tagline": "Focus timer for your glasses",
+  "description": "A simple Pomodoro timer with 5/15/30 min presets, controllable via ring gestures and double-click on the glasses.",
   "author": "Whiskee Chen <whiskee.chen@evenrealities.com>",
   "entrypoint": "index.html",
   "permissions": {

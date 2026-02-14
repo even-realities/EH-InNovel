@@ -4,7 +4,6 @@ package com.fzfstudio.eh.innovel
 
 import com.fzfstudio.eh.innovel.sdk.DeviceInfo
 import com.fzfstudio.eh.innovel.sdk.DeviceStatus
-import com.fzfstudio.eh.innovel.sdk.EvenHubEvent
 import com.fzfstudio.eh.innovel.sdk.UserInfo
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
