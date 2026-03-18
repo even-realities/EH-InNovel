@@ -46,6 +46,11 @@ internal fun deviceStatusFromJs(raw: JsAny?): DeviceStatus? {
     )
 }
 
+internal fun launchSourceFromJs(raw: JsAny?): LaunchSource {
+    if (raw == null) return LaunchSource.AppMenu
+    return LaunchSource.fromString(JsInteropUtils.toStringOrNull(raw))
+}
+
 internal fun evenHubEventFromJs(raw: JsAny?): EvenHubEvent? {
     if (raw == null) return null
     
@@ -366,7 +371,7 @@ private fun ListContainerProperty.toJsonMap(): String =
         "height" to height,
         "borderWidth" to borderWidth,
         "borderColor" to borderColor,
-        "borderRdaius" to borderRdaius,
+        "borderRadius" to borderRadius,
         "paddingLength" to paddingLength,
         "containerID" to containerID,
         "containerName" to containerName,
@@ -382,7 +387,7 @@ private fun TextContainerProperty.toJsonMap(): String =
         "height" to height,
         "borderWidth" to borderWidth,
         "borderColor" to borderColor,
-        "borderRdaius" to borderRdaius,
+        "borderRadius" to borderRadius,
         "paddingLength" to paddingLength,
         "containerID" to containerID,
         "containerName" to containerName,

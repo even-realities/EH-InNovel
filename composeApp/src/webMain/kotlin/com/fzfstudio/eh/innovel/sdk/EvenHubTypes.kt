@@ -95,6 +95,21 @@ data class DeviceInfo(
 }
 
 /**
+ * 页面启动来源。
+ */
+enum class LaunchSource {
+    AppMenu,
+    GlassesMenu;
+
+    companion object {
+        fun fromString(value: String?): LaunchSource = when (value?.lowercase()) {
+            "glassesmenu" -> GlassesMenu
+            else -> AppMenu
+        }
+    }
+}
+
+/**
  * 操作系统事件类型枚举。
  */
 enum class OsEventTypeList(val value: Int) {
@@ -217,7 +232,7 @@ data class ListContainerProperty(
     /** 边框颜色值 */
     val borderColor: Int? = null,
     /** 边框圆角半径 */
-    val borderRdaius: Int? = null,
+    val borderRadius: Int? = null,
     /** 内边距长度 */
     val paddingLength: Int? = null,
     /** 唯一容器 ID */
@@ -247,7 +262,7 @@ data class TextContainerProperty(
     /** 边框颜色值 */
     val borderColor: Int? = null,
     /** 边框圆角半径 */
-    val borderRdaius: Int? = null,
+    val borderRadius: Int? = null,
     /** 内边距长度 */
     val paddingLength: Int? = null,
     /** 唯一容器 ID */

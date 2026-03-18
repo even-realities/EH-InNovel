@@ -88,3 +88,10 @@ expect fun observeDeviceStatus(onChange: (DeviceStatus?) -> Unit): () -> Unit
  * @return 取消监听的函数
  */
 expect fun observeEvenHubEvent(onChange: (EvenHubEvent?) -> Unit): () -> Unit
+
+/**
+ * 监听页面启动来源。
+ * @param onChange 启动来源变化时的回调函数
+ * @return 取消监听的函数
+ */
+expect fun observeLaunchSource(onChange: (LaunchSource) -> Unit): () -> Unit
