@@ -24,6 +24,8 @@ data class AppUiState(
     val deviceInfo: DeviceInfo? = null,
     /** 设备状态（可能为空） */
     val deviceStatus: DeviceStatus? = null,
+    /** 页面启动来源 */
+    val launchSource: LaunchSource? = null,
     /** 书架图书列表 */
     val books: List<BookModel> = emptyList(),
     /** 页面级错误提示（可为空） */
@@ -46,6 +48,8 @@ class AppState {
     private var unsubscribeDeviceStatus: (() -> Unit)? = null
     /** 取消 EvenHubEvent 监听的函数 */
     private var unsubscribeEvenHubEvent: (() -> Unit)? = null
+    /** 取消启动来源监听的函数 */
+    private var unsubscribeLaunchSource: (() -> Unit)? = null
     
     /** 当前阅读的书本 ID，默认为 book_001 */
     private var currentReadingBookId: String = "book_001"
@@ -69,6 +73,8 @@ class AppState {
         if (uiState.isBridgeReady) return
         try {
             ensureEvenAppBridge()
+            // 启动来源通常只推送一次，尽早注册监听避免错过首个事件。
+            setupLaunchSourceObserver()
             val userInfo = runCatching { getUserInfo() }
                 .getOrElse { error ->
                     uiState = uiState.copy(errorMessage = "Failed to get user info: ${error.message}")
@@ -98,6 +104,17 @@ class AppState {
             setupEvenHubEventObserver()
         } catch (e: Exception) {
             uiState = uiState.copy(errorMessage = "Failed to initialize bridge: ${e.message}")
+        }
+    }
+
+    /**
+     * 设置启动来源监听
+     */
+    private fun setupLaunchSourceObserver() {
+        unsubscribeLaunchSource?.invoke()
+        unsubscribeLaunchSource = observeLaunchSource { source ->
+            uiState = uiState.copy(launchSource = source)
+            println("[LaunchSource] $source")
         }
     }
     
@@ -309,6 +326,8 @@ class AppState {
         unsubscribeDeviceStatus = null
         unsubscribeEvenHubEvent?.invoke()
         unsubscribeEvenHubEvent = null
+        unsubscribeLaunchSource?.invoke()
+        unsubscribeLaunchSource = null
     }
 
     /**
@@ -342,7 +361,7 @@ class AppState {
             height = 30,
             borderWidth = 1,
             borderColor = 13,
-            borderRdaius = 6,
+            borderRadius = 6,
             paddingLength = 0,
             content = "《${book.title}》--作者:${book.author}",
         )
@@ -357,7 +376,7 @@ class AppState {
                 height = 200,
                 borderWidth = 1,
                 borderColor = 13,
-                borderRdaius = 6,
+                borderRadius = 6,
                 paddingLength = 5,
                 isEventCapture = 1,
                 itemContainer = ListItemContainerProperty(
@@ -383,7 +402,7 @@ class AppState {
             height = 200,
             borderWidth = 1,
             borderColor = 13,
-            borderRdaius = 6,
+            borderRadius = 6,
             paddingLength = 12,
             content = "${currentChapter.title}\n\n${currentChapter.displayContent}\n\n双击全屏阅读>>",
         )
@@ -457,7 +476,7 @@ class AppState {
                     height = 235,
                     borderWidth = 1,
                     borderColor = 13,
-                    borderRdaius = 6,
+                    borderRadius = 6,
                     paddingLength = 12,
                     isEventCapture = 1,
                 )

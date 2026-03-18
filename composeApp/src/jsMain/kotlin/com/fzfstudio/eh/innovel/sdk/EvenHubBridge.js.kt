@@ -75,3 +75,8 @@ actual fun observeEvenHubEvent(onChange: (EvenHubEvent?) -> Unit): () -> Unit =
     EvenAppBridge.getInstance().onEvenHubEvent { event ->
         onChange(evenHubEventFromJs(event))
     }
+
+actual fun observeLaunchSource(onChange: (LaunchSource) -> Unit): () -> Unit =
+    EvenAppBridge.getInstance().onLaunchSource { source ->
+        onChange(LaunchSource.fromString(source))
+    }

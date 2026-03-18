@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fzfstudio.eh.innovel.models.AppUiState
 import com.fzfstudio.eh.innovel.models.BookModel
+import com.fzfstudio.eh.innovel.sdk.LaunchSource
 import com.fzfstudio.eh.innovel.sdk.ShutDownContainer
-import com.fzfstudio.eh.innovel.views.ReadingDialog
 import com.fzfstudio.eh.innovel.sdk.shutDownPageContainer
 import kotlinx.coroutines.launch
 
@@ -39,12 +39,22 @@ fun AppScreen(
     onExitReading: () -> Unit
 ) {
     val readingBook = remember { mutableStateOf<BookModel?>(null) }
+    val launchSourceText = when (uiState.launchSource) {
+        LaunchSource.GlassesMenu -> "应用通过 GlassesMenu 打开"
+        LaunchSource.AppMenu -> "应用通过 AppMenu 打开"
+        null -> "应用启动来源待确认"
+    }
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         if (uiState.errorMessage != null) {
             ErrorBanner(uiState.errorMessage)
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = launchSourceText)
         }
         Row(
             modifier = Modifier

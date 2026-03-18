@@ -24,6 +24,7 @@ external class EvenAppBridge : JsAny {
     fun getDeviceInfo(): Promise<JsAny?>
     fun onDeviceStatusChanged(callback: (status: JsAny?) -> Unit): () -> Unit
     fun onEvenHubEvent(callback: (event: JsAny?) -> Unit): () -> Unit
+    fun onLaunchSource(callback: (source: JsAny?) -> Unit): () -> Unit
 
     companion object {
         fun getInstance(): EvenAppBridge

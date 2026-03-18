@@ -79,6 +79,11 @@ actual fun observeEvenHubEvent(onChange: (EvenHubEvent?) -> Unit): () -> Unit =
         onChange(evenHubEventFromJs(event))
     }
 
+actual fun observeLaunchSource(onChange: (LaunchSource) -> Unit): () -> Unit =
+    EvenAppBridge.getInstance().onLaunchSource { source ->
+        onChange(launchSourceFromJs(source))
+    }
+
 // Promise -> suspend adapter for wasm.
 private suspend fun <T : JsAny?> Promise<T>.awaitWasm(): T = suspendCancellableCoroutine { cont ->
     this.then(
@@ -92,4 +97,3 @@ private suspend fun <T : JsAny?> Promise<T>.awaitWasm(): T = suspendCancellableC
         }
     )
 }
-
