@@ -30,7 +30,7 @@ import kotlin.js.js
 @Composable
 fun TextImageView() {
     val coroutineScope = rememberCoroutineScope()
-    var containerId by remember { mutableStateOf<Int?>(null) }
+    var lastCreateResult by remember { mutableStateOf<StartUpPageCreateResult?>(null) }
     
     // 宽高状态，默认 90
     var width by remember { mutableStateOf(90) }
@@ -152,8 +152,8 @@ fun TextImageView() {
             modifier = Modifier.fillMaxWidth(),
             onClick = {
                 coroutineScope.launch {
-                    handleTestButtonClick(width, height) { id ->
-                        containerId = id
+                    handleTestButtonClick(width, height) { result ->
+                        lastCreateResult = result
                     }
                 }
             }
@@ -233,7 +233,7 @@ private fun DrawScope.draw3DRectangleWithSize(actualWidth: Int, actualHeight: In
 private suspend fun handleTestButtonClick(
     width: Int,
     height: Int,
-    onContainerCreated: (Int?) -> Unit
+    onContainerCreated: (StartUpPageCreateResult) -> Unit,
 ) {
     try {
         // 1. 创建 HTML Canvas 并绘制内容（使用输入的宽高，整数尺寸）
@@ -289,22 +289,22 @@ private suspend fun handleTestButtonClick(
             imageObject = listOf(imageContainer)
         )
         
-        val createdContainerId = createStartUpPageContainer(container)
-        onContainerCreated(createdContainerId)
-        
-        if (createdContainerId != null) {
+        val createResult = createStartUpPageContainer(container)
+        onContainerCreated(createResult)
+
+        if (createResult == StartUpPageCreateResult.Success) {
             // 5. 上传图片数据
             val imageUpdate = ImageRawDataUpdate(
                 containerID = 100,
                 containerName = "testImage",
                 imageData = arrayBuffer // 可以是 ArrayBuffer，会在 toJson 时转换为 number[]
             )
-            
-            val success = updateImageRawData(imageUpdate)
-            if (success) {
+
+            val imageResult = updateImageRawData(imageUpdate)
+            if (imageResult.isSuccess) {
                 println("Image uploaded successfully")
             } else {
-                println("Failed to upload image")
+                println("Failed to upload image: $imageResult")
             }
         }
         

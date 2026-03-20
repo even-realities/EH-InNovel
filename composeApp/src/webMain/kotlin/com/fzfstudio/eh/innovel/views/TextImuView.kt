@@ -1,6 +1,7 @@
 package com.fzfstudio.eh.innovel.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -21,21 +24,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.fzfstudio.eh.innovel.sdk.audioControl
+import com.fzfstudio.eh.innovel.sdk.ImuReportFrequency
+import com.fzfstudio.eh.innovel.sdk.imuControl
 import kotlinx.coroutines.launch
 
 /**
- * 音频测试视图组件
- * 提供打开/关闭 Audio 的测试按钮，并展示通过 audioEvent 接收到的音频数据（转成文本）。
+ * IMU 测试：开关上报，并展示 `sysEvent.imuData` 解析后的文本行（与 [TextAudioView] 展示风格一致）。
  *
- * @param displayLines 由 EvenHubEvent.audioEvent 解析出的展示行（PCM 长度、hex 等），由 AppState 维护
+ * @param displayLines 由 [com.fzfstudio.eh.innovel.models.AppState] 根据 EvenHub `sysEvent` 维护
  */
 @Composable
-fun TextAudioView(
+fun TextImuView(
     displayLines: List<String> = emptyList(),
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val audioEnabled = remember { mutableStateOf(false) }
+    val imuEnabled = remember { mutableStateOf(false) }
+    val selectedReportFrq = remember { mutableStateOf(ImuReportFrequency.Hz100) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -46,7 +50,7 @@ fun TextAudioView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -54,23 +58,26 @@ fun TextAudioView(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "Audio 上报",
+                    text = "IMU 上报",
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Switch(
-                    checked = audioEnabled.value,
+                    checked = imuEnabled.value,
                     onCheckedChange = { wantOn ->
                         coroutineScope.launch {
-                            val ok = audioControl(wantOn)
+                            val ok = imuControl(
+                                isOpen = wantOn,
+                                reportFrq = selectedReportFrq.value,
+                            )
                             if (ok) {
-                                audioEnabled.value = wantOn
+                                imuEnabled.value = wantOn
                                 if (wantOn) {
-                                    println("Audio opened")
+                                    println("IMU reporting on (${selectedReportFrq.value.hz} Hz)")
                                 } else {
-                                    println("Audio closed")
+                                    println("IMU reporting off")
                                 }
                             } else {
-                                println("Audio ${if (wantOn) "open" else "close"} failed")
+                                println("imuControl failed (requested ${if (wantOn) "on" else "off"})")
                             }
                         }
                     },
@@ -78,7 +85,43 @@ fun TextAudioView(
             }
 
             Text(
-                text = "音频事件 (audioEvent)",
+                text = "reportFrq: ${selectedReportFrq.value.hz} Hz",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ImuReportFrequency.entries.forEach { frequency ->
+                    val isSelected = selectedReportFrq.value == frequency
+                    Button(
+                        modifier = Modifier,
+                        onClick = {
+                            selectedReportFrq.value = frequency
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            },
+                            contentColor = if (isSelected) {
+                                MaterialTheme.colorScheme.onPrimary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        ),
+                    ) {
+                        Text("${frequency.hz}Hz")
+                    }
+                }
+            }
+
+            Text(
+                text = "IMU 数据 (sysEvent.imuData)",
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -89,20 +132,20 @@ fun TextAudioView(
                     .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     .verticalScroll(rememberScrollState())
                     .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 if (displayLines.isEmpty()) {
                     Text(
-                        text = "暂无数据。打开 Audio 后，宿主推送的 PCM 会在此显示。",
+                        text = "暂无数据。打开开关后，宿主推送的 x/y/z 会在此显示。",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else {
                     displayLines.forEach { line ->
                         Text(
                             text = line,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }

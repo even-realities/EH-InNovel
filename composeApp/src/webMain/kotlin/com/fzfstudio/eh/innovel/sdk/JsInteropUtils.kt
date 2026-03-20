@@ -79,9 +79,15 @@ object JsInteropUtils {
     /**
      * 获取对象的整数属性
      */
-    fun getIntProperty(obj: JsAny?, key: String): Int? = 
+    fun getIntProperty(obj: JsAny?, key: String): Int? =
         toIntOrNull(getProperty(obj, key))
-    
+
+    /**
+     * 获取对象的浮点属性（IMU x/y/z 等）
+     */
+    fun getDoubleProperty(obj: JsAny?, key: String): Double? =
+        toDoubleOrNull(getProperty(obj, key))
+
     /**
      * 获取对象的布尔属性
      */

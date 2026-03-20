@@ -58,11 +58,11 @@ expect suspend fun getDeviceInfo(): DeviceInfo?
  *
  * 说明：统一以 JSON 字符串传参，避免在 shared 层直接构建 JsAny。
  */
-expect suspend fun createStartUpPageContainer(container: CreateStartUpPageContainer): Int?
+expect suspend fun createStartUpPageContainer(container: CreateStartUpPageContainer): StartUpPageCreateResult
 
 expect suspend fun rebuildPageContainer(container: RebuildPageContainer): Boolean
 
-expect suspend fun updateImageRawData(data: ImageRawDataUpdate): Boolean
+expect suspend fun updateImageRawData(data: ImageRawDataUpdate): ImageRawDataUpdateResult
 
 expect suspend fun textContainerUpgrade(container: TextContainerUpgrade): Boolean
 
@@ -74,6 +74,14 @@ expect suspend fun shutDownPageContainer(container: ShutDownContainer): Boolean
  * @return 是否成功
  */
 expect suspend fun audioControl(isOpen: Boolean): Boolean
+
+/**
+ * IMU 上报开关与频率（对齐 SDK `imuControl` / PB `IMU_CtrlCmd`）。
+ *
+ * @param isOpen `true` 开启上报，`false` 关闭
+ * @param reportFrq 上报频率，默认 100 Hz（与 SDK 一致：100～1000，步进 100）
+ */
+expect suspend fun imuControl(isOpen: Boolean, reportFrq: ImuReportFrequency = ImuReportFrequency.Hz100): Boolean
 
 /**
  * 监听设备状态变化

@@ -34,6 +34,8 @@ data class AppUiState(
     val isFullScreenReading: Boolean = false,
     /** 音频事件展示行（Test Audio 用，最近 N 条） */
     val audioEventDisplayLines: List<String> = emptyList(),
+    /** IMU 上报展示行（Test IMU 用，最近 N 条） */
+    val imuEventDisplayLines: List<String> = emptyList(),
 )
 
 /**
@@ -181,7 +183,10 @@ class AppState {
     
     /** 音频事件展示行最大条数 */
     private val maxAudioEventDisplayLines = 100
-    
+
+    /** IMU 展示行最大条数 */
+    private val maxImuEventDisplayLines = 100
+
     /**
      * 将收到的音频事件转成展示文本并追加到 UI 状态。
      */
@@ -201,7 +206,23 @@ class AppState {
             audioEventDisplayLines = (uiState.audioEventDisplayLines + line).takeLast(maxAudioEventDisplayLines)
         )
     }
-    
+
+    /**
+     * 将收到的 IMU 数据转成展示文本并追加到 UI 状态。
+     */
+    private fun appendImuEventDisplay(data: ImuReportData) {
+        val parts = buildList {
+            data.x?.let { add("x=$it") }
+            data.y?.let { add("y=$it") }
+            data.z?.let { add("z=$it") }
+        }
+        if (parts.isEmpty()) return
+        val line = parts.joinToString(", ")
+        uiState = uiState.copy(
+            imuEventDisplayLines = (uiState.imuEventDisplayLines + line).takeLast(maxImuEventDisplayLines)
+        )
+    }
+
     /**
      * 处理列表项事件
      */
@@ -273,6 +294,8 @@ class AppState {
      * 处理系统事件
      */
     private fun handleSysItemEvent(event: SysItemEvent) {
+        event.imuData?.let { appendImuEventDisplay(it) }
+
         // 处理系统级事件，比如进入前台、退出前台等
         when (event.eventType) {
             OsEventTypeList.DOUBLE_CLICK_EVENT -> {

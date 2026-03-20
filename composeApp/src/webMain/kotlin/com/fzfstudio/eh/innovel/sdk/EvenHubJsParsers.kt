@@ -138,17 +138,17 @@ private fun parseAudioPcmToIntList(raw: JsAny?): List<Int>? {
  */
 internal fun osEventTypeListFromJs(raw: JsAny?): OsEventTypeList? {
     if (raw == null) return null
-    
+
     // 如果 raw 本身是数字（OsEventTypeList 枚举值就是数字）
     val directInt = JsInteropUtils.toIntOrNull(raw)
-    if (directInt != null && directInt >= 0 && directInt <= 6) {
+    if (directInt != null && directInt >= 0 && directInt <= 8) {
         return OsEventTypeList.fromInt(directInt)
     }
-    
+
     // 尝试从对象的 value 属性获取
     val intValue = JsInteropUtils.getIntProperty(raw, "value")
         ?: JsInteropUtils.toIntOrNull(raw)
-    if (intValue != null && intValue >= 0 && intValue <= 6) {
+    if (intValue != null && intValue >= 0 && intValue <= 8) {
         return OsEventTypeList.fromInt(intValue)
     }
     
@@ -234,16 +234,99 @@ internal fun textItemEventFromJs(raw: JsAny?): TextItemEvent? {
  */
 internal fun sysItemEventFromJs(raw: JsAny?): SysItemEvent? {
     if (raw == null) return null
-    
+
     val eventTypeRaw = JsInteropUtils.getProperty(raw, "eventType")
         ?: JsInteropUtils.getProperty(raw, "EventType")
         ?: JsInteropUtils.getProperty(raw, "Event_Type")
-    
+
     val eventType = osEventTypeListFromJs(eventTypeRaw)
-    
+
+    val imuRaw = JsInteropUtils.getProperty(raw, "imuData")
+        ?: JsInteropUtils.getProperty(raw, "IMUData")
+        ?: JsInteropUtils.getProperty(raw, "IMU_Data")
+        ?: JsInteropUtils.getProperty(raw, "iMUData")
+
+    val imuData = imuReportDataFromJs(imuRaw)
+
     return SysItemEvent(
         eventType = eventType,
+        imuData = imuData,
     )
+}
+
+/**
+ * 从 JS 解析 IMU_Report_Data（x / y / z）。
+ */
+internal fun imuReportDataFromJs(raw: JsAny?): ImuReportData? {
+    if (raw == null) return null
+    val x = JsInteropUtils.getDoubleProperty(raw, "x")
+        ?: JsInteropUtils.getDoubleProperty(raw, "X")
+    val y = JsInteropUtils.getDoubleProperty(raw, "y")
+        ?: JsInteropUtils.getDoubleProperty(raw, "Y")
+    val z = JsInteropUtils.getDoubleProperty(raw, "z")
+        ?: JsInteropUtils.getDoubleProperty(raw, "Z")
+    if (x == null && y == null && z == null) return null
+    return ImuReportData(x = x, y = y, z = z)
+}
+
+internal fun startUpPageCreateResultFromJs(raw: JsAny?): StartUpPageCreateResult {
+    if (raw == null) return StartUpPageCreateResult.Invalid
+    val num = JsInteropUtils.toDoubleOrNull(raw)
+    if (num != null && num.isFinite()) {
+        return StartUpPageCreateResult.fromInt(num.toInt())
+    }
+    val str = JsInteropUtils.toStringOrNull(raw)
+    if (str != null) {
+        val n = str.toDoubleOrNull()
+        if (n != null && n.isFinite()) return StartUpPageCreateResult.fromInt(n.toInt())
+        return parseStartUpPageCreateResultString(str)
+    }
+    JsInteropUtils.getIntProperty(raw, "index")?.let { return StartUpPageCreateResult.fromInt(it) }
+    JsInteropUtils.getIntProperty(raw, "value")?.let { return StartUpPageCreateResult.fromInt(it) }
+    JsInteropUtils.getStringProperty(raw, "name")?.let { return parseStartUpPageCreateResultString(it) }
+    return StartUpPageCreateResult.Invalid
+}
+
+private fun parseStartUpPageCreateResultString(s: String): StartUpPageCreateResult {
+    val last = s.trim().lowercase().substringAfterLast('.')
+    return when (last) {
+        "success" -> StartUpPageCreateResult.Success
+        "invalid" -> StartUpPageCreateResult.Invalid
+        "oversize" -> StartUpPageCreateResult.Oversize
+        "outofmemory", "out_of_memory" -> StartUpPageCreateResult.OutOfMemory
+        else -> StartUpPageCreateResult.Invalid
+    }
+}
+
+internal fun imageRawDataUpdateResultFromJs(raw: JsAny?): ImageRawDataUpdateResult {
+    if (raw == null) return ImageRawDataUpdateResult.SendFailed
+    val num = JsInteropUtils.toDoubleOrNull(raw)
+    if (num != null && num.isFinite()) {
+        return ImageRawDataUpdateResult.fromInt(num.toInt())
+    }
+    val str = JsInteropUtils.toStringOrNull(raw)
+    if (str != null) {
+        val n = str.toDoubleOrNull()
+        if (n != null && n.isFinite()) return ImageRawDataUpdateResult.fromInt(n.toInt())
+        return parseImageRawDataUpdateResultString(str)
+    }
+    JsInteropUtils.getIntProperty(raw, "index")?.let { return ImageRawDataUpdateResult.fromInt(it) }
+    JsInteropUtils.getIntProperty(raw, "value")?.let { return ImageRawDataUpdateResult.fromInt(it) }
+    JsInteropUtils.getStringProperty(raw, "name")?.let { return parseImageRawDataUpdateResultString(it) }
+    return ImageRawDataUpdateResult.SendFailed
+}
+
+private fun parseImageRawDataUpdateResultString(s: String): ImageRawDataUpdateResult {
+    val last = s.trim().lowercase().substringAfterLast('.')
+    return when (last) {
+        "success" -> ImageRawDataUpdateResult.Success
+        "imageexception" -> ImageRawDataUpdateResult.ImageException
+        "imagesizeinvalid" -> ImageRawDataUpdateResult.ImageSizeInvalid
+        "imagetogray4failed", "imagetograyfailed", "imageto_gray4failed", "image_to_gray4_failed" ->
+            ImageRawDataUpdateResult.ImageToGray4Failed
+        "sendfailed" -> ImageRawDataUpdateResult.SendFailed
+        else -> ImageRawDataUpdateResult.SendFailed
+    }
 }
 
 internal fun CreateStartUpPageContainer.toJsonString(): String =
