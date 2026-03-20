@@ -54,9 +54,9 @@
 
 | 接口 | 说明 |
 |------|------|
-| `createStartUpPageContainer(container): Int?` | 创建启动页容器（文本/列表/图片），返回容器 ID |
+| `createStartUpPageContainer(container): StartUpPageCreateResult` | 创建启动页容器（文本/列表/图片），与 SDK `StartUpPageCreateResult` 对齐 |
 | `rebuildPageContainer(container): Boolean` | 重建页面容器 |
-| `updateImageRawData(data): Boolean` | 更新图片原始数据（如 `imageData` 为 number[]） |
+| `updateImageRawData(data): ImageRawDataUpdateResult` | 更新图片原始数据（如 `imageData` 为 number[]）；用 `isSuccess` 判断是否成功 |
 | `textContainerUpgrade(container): Boolean` | 升级文本容器内容 |
 | `shutDownPageContainer(container): Boolean` | 关闭页面容器（退出 Even Hub 页面） |
 

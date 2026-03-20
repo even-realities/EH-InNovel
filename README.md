@@ -54,9 +54,9 @@ Page containers and event subscription (aligned with host BleG2CmdProtoEvenHubEx
 
 | API | Description |
 |-----|-------------|
-| `createStartUpPageContainer(container): Int?` | Create startup page container (text/list/image); returns container ID |
+| `createStartUpPageContainer(container): StartUpPageCreateResult` | Create startup page container (text/list/image); aligned with SDK `StartUpPageCreateResult` |
 | `rebuildPageContainer(container): Boolean` | Rebuild page container |
-| `updateImageRawData(data): Boolean` | Update image raw data (e.g. `imageData` as number[]) |
+| `updateImageRawData(data): ImageRawDataUpdateResult` | Update image raw data (e.g. `imageData` as number[]); use `isSuccess` extension |
 | `textContainerUpgrade(container): Boolean` | Upgrade text container content |
 | `shutDownPageContainer(container): Boolean` | Shut down page container (exit Even Hub page) |
 

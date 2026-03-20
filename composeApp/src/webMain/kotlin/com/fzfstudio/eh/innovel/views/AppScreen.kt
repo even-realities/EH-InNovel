@@ -105,6 +105,7 @@ fun AppScreen(
         ) {
             TextImageView()
             TextAudioView(displayLines = uiState.audioEventDisplayLines)
+            TextImuView(displayLines = uiState.imuEventDisplayLines)
         }
 
         Spacer(modifier = Modifier.height(24.dp))

@@ -119,22 +119,98 @@ enum class OsEventTypeList(val value: Int) {
     DOUBLE_CLICK_EVENT(3),
     FOREGROUND_ENTER_EVENT(4),
     FOREGROUND_EXIT_EVENT(5),
-    ABNORMAL_EXIT_EVENT(6);
-    
+    ABNORMAL_EXIT_EVENT(6),
+    SYSTEM_EXIT_EVENT(7),
+    IMU_DATA_REPORT(8);
+
     companion object {
         fun fromInt(value: Int?): OsEventTypeList? {
             return values().find { it.value == value }
         }
-        
+
         fun fromString(value: String?): OsEventTypeList? {
             if (value == null) return null
-            return values().find { 
+            val upper = value.trim().uppercase()
+            when (upper) {
+                "SYSTEM_EXIT_EVENT", "SYSTEM_EXIT" -> return SYSTEM_EXIT_EVENT
+                "IMU_DATA_REPORT", "IMU_DATA", "IMU_REPORT" -> return IMU_DATA_REPORT
+            }
+            return values().find {
                 it.name.equals(value, ignoreCase = true) ||
-                it.name.replace("_EVENT", "").equals(value, ignoreCase = true)
+                    it.name.replace("_EVENT", "").equals(value, ignoreCase = true)
             }
         }
     }
 }
+
+/**
+ * IMU 上报频率（Hz），与 `@evenrealities/even_hub_sdk` 的 `ImuReportFrequency` 一致（100～1000，步进 100）。
+ */
+enum class ImuReportFrequency(val hz: Int) {
+    Hz100(100),
+    Hz200(200),
+    Hz300(300),
+    Hz400(400),
+    Hz500(500),
+    Hz600(600),
+    Hz700(700),
+    Hz800(800),
+    Hz900(900),
+    Hz1000(1000),
+}
+
+/**
+ * 启动页容器创建结果（对齐宿主 `EhStartUpPageCreateResult` / SDK `StartUpPageCreateResult`）。
+ */
+enum class StartUpPageCreateResult {
+    Success,
+    Invalid,
+    Oversize,
+    OutOfMemory;
+
+    companion object {
+        fun fromInt(value: Int): StartUpPageCreateResult = when (value) {
+            0 -> Success
+            1 -> Invalid
+            2 -> Oversize
+            3 -> OutOfMemory
+            else -> Invalid
+        }
+    }
+}
+
+/**
+ * 图片原始数据更新结果（对齐宿主 `BleEhSendImageResult` / SDK `ImageRawDataUpdateResult`）。
+ */
+enum class ImageRawDataUpdateResult {
+    Success,
+    ImageException,
+    ImageSizeInvalid,
+    ImageToGray4Failed,
+    SendFailed;
+
+    companion object {
+        fun fromInt(value: Int): ImageRawDataUpdateResult = when (value) {
+            0 -> Success
+            1 -> ImageException
+            2 -> ImageSizeInvalid
+            3 -> SendFailed
+            else -> SendFailed
+        }
+    }
+}
+
+val ImageRawDataUpdateResult.isSuccess: Boolean
+    get() = this == ImageRawDataUpdateResult.Success
+
+/**
+ * IMU 上报数据（`Sys_ItemEvent.imuData` / PB `IMU_Report_Data`：`x` / `y` / `z`）。
+ */
+data class ImuReportData(
+    val x: Double? = null,
+    val y: Double? = null,
+    val z: Double? = null,
+)
 
 /**
  * 列表项事件。
@@ -170,6 +246,8 @@ data class TextItemEvent(
 data class SysItemEvent(
     /** 事件类型 */
     val eventType: OsEventTypeList? = null,
+    /** IMU 数据（开启 IMU 上报时由宿主填充） */
+    val imuData: ImuReportData? = null,
 )
 
 /**

@@ -35,9 +35,9 @@ actual suspend fun getUserInfo(): UserInfo? =
 actual suspend fun getDeviceInfo(): DeviceInfo? =
     deviceInfoFromJs(EvenAppBridge.getInstance().getDeviceInfo().await())
 
-actual suspend fun createStartUpPageContainer(container: CreateStartUpPageContainer): Int? {
+actual suspend fun createStartUpPageContainer(container: CreateStartUpPageContainer): StartUpPageCreateResult {
     val result = callEvenAppJson("createStartUpPageContainer", container.toJsonString())
-    return jsToDoubleOrNull(result)?.toInt()
+    return startUpPageCreateResultFromJs(result)
 }
 
 actual suspend fun rebuildPageContainer(container: RebuildPageContainer): Boolean {
@@ -45,9 +45,9 @@ actual suspend fun rebuildPageContainer(container: RebuildPageContainer): Boolea
     return jsToBoolOrNull(result) ?: false
 }
 
-actual suspend fun updateImageRawData(data: ImageRawDataUpdate): Boolean {
+actual suspend fun updateImageRawData(data: ImageRawDataUpdate): ImageRawDataUpdateResult {
     val result = callEvenAppJson("updateImageRawData", data.toJsonString())
-    return jsToBoolOrNull(result) ?: false
+    return imageRawDataUpdateResultFromJs(result)
 }
 
 actual suspend fun textContainerUpgrade(container: TextContainerUpgrade): Boolean {
@@ -62,7 +62,14 @@ actual suspend fun shutDownPageContainer(container: ShutDownContainer): Boolean 
 
 actual suspend fun audioControl(isOpen: Boolean): Boolean {
     val result = callEvenAppJson("audioControl", "{\"isOpen\":$isOpen}")
-    return jsToBoolOrNull(result) ?: false
+    return jsToBoolOrNull(result) == true
+}
+
+actual suspend fun imuControl(isOpen: Boolean, reportFrq: ImuReportFrequency): Boolean {
+    val en = if (isOpen) 1 else 0
+    val frq = reportFrq.hz
+    val result = callEvenAppJson("imuControl", "{\"iMUReportEn\":$en,\"reportFrq\":$frq}")
+    return jsToBoolOrNull(result) == true
 }
 
 actual fun observeDeviceStatus(onChange: (DeviceStatus?) -> Unit): () -> Unit =
