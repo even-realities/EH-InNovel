@@ -24,7 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.fzfstudio.eh.innovel.sdk.ImuReportFrequency
+import com.fzfstudio.eh.innovel.sdk.ImuReportPace
 import com.fzfstudio.eh.innovel.sdk.imuControl
 import kotlinx.coroutines.launch
 
@@ -39,7 +39,7 @@ fun TextImuView(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val imuEnabled = remember { mutableStateOf(false) }
-    val selectedReportFrq = remember { mutableStateOf(ImuReportFrequency.Hz100) }
+    val selectedReportFrq = remember { mutableStateOf(ImuReportPace.P100) }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -72,7 +72,7 @@ fun TextImuView(
                             if (ok) {
                                 imuEnabled.value = wantOn
                                 if (wantOn) {
-                                    println("IMU reporting on (${selectedReportFrq.value.hz} Hz)")
+                                    println("IMU reporting on (pace=${selectedReportFrq.value.value})")
                                 } else {
                                     println("IMU reporting off")
                                 }
@@ -85,7 +85,7 @@ fun TextImuView(
             }
 
             Text(
-                text = "reportFrq: ${selectedReportFrq.value.hz} Hz",
+                text = "report pace: ${selectedReportFrq.value.value}",
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -95,7 +95,7 @@ fun TextImuView(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                ImuReportFrequency.entries.forEach { frequency ->
+                ImuReportPace.entries.forEach { frequency ->
                     val isSelected = selectedReportFrq.value == frequency
                     Button(
                         modifier = Modifier,
@@ -115,7 +115,7 @@ fun TextImuView(
                             },
                         ),
                     ) {
-                        Text("${frequency.hz}Hz")
+                        Text("${frequency.value}")
                     }
                 }
             }
