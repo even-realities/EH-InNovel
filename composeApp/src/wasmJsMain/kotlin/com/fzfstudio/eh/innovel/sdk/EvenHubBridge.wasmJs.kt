@@ -68,9 +68,9 @@ actual suspend fun audioControl(isOpen: Boolean): Boolean {
     return jsToBoolOrNull(result) == true
 }
 
-actual suspend fun imuControl(isOpen: Boolean, reportFrq: ImuReportFrequency): Boolean {
+actual suspend fun imuControl(isOpen: Boolean, reportFrq: ImuReportPace): Boolean {
     val en = if (isOpen) 1 else 0
-    val frq = reportFrq.hz
+    val frq = reportFrq.value
     val result = callEvenAppJson("imuControl", "{\"iMUReportEn\":$en,\"reportFrq\":$frq}")
     return jsToBoolOrNull(result) == true
 }

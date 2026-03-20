@@ -144,19 +144,19 @@ enum class OsEventTypeList(val value: Int) {
 }
 
 /**
- * IMU 上报频率（Hz），与 `@evenrealities/even_hub_sdk` 的 `ImuReportFrequency` 一致（100～1000，步进 100）。
+ * IMU 上报快慢档位，与 `@evenrealities/even_hub_sdk` 的 `ImuReportPace` 一致（100～1000，步进 100）。
  */
-enum class ImuReportFrequency(val hz: Int) {
-    Hz100(100),
-    Hz200(200),
-    Hz300(300),
-    Hz400(400),
-    Hz500(500),
-    Hz600(600),
-    Hz700(700),
-    Hz800(800),
-    Hz900(900),
-    Hz1000(1000),
+enum class ImuReportPace(val value: Int) {
+    P100(100),
+    P200(200),
+    P300(300),
+    P400(400),
+    P500(500),
+    P600(600),
+    P700(700),
+    P800(800),
+    P900(900),
+    P1000(1000),
 }
 
 /**
