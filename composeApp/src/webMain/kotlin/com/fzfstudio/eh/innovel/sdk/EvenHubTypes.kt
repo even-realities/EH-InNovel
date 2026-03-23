@@ -383,6 +383,8 @@ data class CreateStartUpPageContainer(
     val textObject: List<TextContainerProperty>? = null,
     /** 图片容器对象列表 */
     val imageObject: List<ImageContainerProperty>? = null,
+    /** 宿主 widgetId；通常由 SDK bridge 自动注入，无需手动传 */
+    val widgetId: Int? = null,
 )
 
 /**

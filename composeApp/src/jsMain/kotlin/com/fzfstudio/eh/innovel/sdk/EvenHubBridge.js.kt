@@ -37,39 +37,47 @@ actual suspend fun getDeviceInfo(): DeviceInfo? =
     deviceInfoFromJs(EvenAppBridge.getInstance().getDeviceInfo().await())
 
 actual suspend fun createStartUpPageContainer(container: CreateStartUpPageContainer): StartUpPageCreateResult {
-    val result = callEvenAppJson("createStartUpPageContainer", container.toJsonString())
+    val result = EvenAppBridge.getInstance()
+        .createStartUpPageContainer(jsParseJson(container.toJsonString()))
+        .await()
     return startUpPageCreateResultFromJs(result)
 }
 
 actual suspend fun rebuildPageContainer(container: RebuildPageContainer): Boolean {
-    val result = callEvenAppJson("rebuildPageContainer", container.toJsonString())
+    val result = EvenAppBridge.getInstance()
+        .rebuildPageContainer(jsParseJson(container.toJsonString()))
+        .await()
     return jsToBoolOrNull(result) ?: false
 }
 
 actual suspend fun updateImageRawData(data: ImageRawDataUpdate): ImageRawDataUpdateResult {
-    val result = callEvenAppJson("updateImageRawData", data.toJsonString())
+    val result = EvenAppBridge.getInstance()
+        .updateImageRawData(jsParseJson(data.toJsonString()))
+        .await()
     return imageRawDataUpdateResultFromJs(result)
 }
 
 actual suspend fun textContainerUpgrade(container: TextContainerUpgrade): Boolean {
-    val result = callEvenAppJson("textContainerUpgrade", container.toJsonString())
+    val result = EvenAppBridge.getInstance()
+        .textContainerUpgrade(jsParseJson(container.toJsonString()))
+        .await()
     return jsToBoolOrNull(result) ?: false
 }
 
 actual suspend fun shutDownPageContainer(container: ShutDownContainer): Boolean {
-    val result = callEvenAppJson("shutDownPageContainer", container.toJsonString())
+    val result = EvenAppBridge.getInstance()
+        .shutDownPageContainer(container.exitMode)
+        .await()
     return jsToBoolOrNull(result) ?: false
 }
 
 actual suspend fun audioControl(isOpen: Boolean): Boolean {
-    val result = callEvenAppJson("audioControl", "{\"isOpen\":$isOpen}")
+    val result = EvenAppBridge.getInstance().audioControl(isOpen).await()
     return jsToBoolOrNull(result) == true
 }
 
 actual suspend fun imuControl(isOpen: Boolean, reportFrq: ImuReportPace): Boolean {
-    val en = if (isOpen) 1 else 0
-    val frq = reportFrq.value
-    val result = callEvenAppJson("imuControl", "{\"iMUReportEn\":$en,\"reportFrq\":$frq}")
+    val result = EvenAppBridge.getInstance().imuControl(isOpen, reportFrq.value).await()
     return jsToBoolOrNull(result) == true
 }
 
