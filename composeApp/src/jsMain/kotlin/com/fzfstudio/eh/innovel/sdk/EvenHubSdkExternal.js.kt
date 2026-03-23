@@ -23,6 +23,13 @@ external class EvenAppBridge {
     // Convenience wrappers provided by the JS SDK.
     fun getUserInfo(): Promise<JsAny?>
     fun getDeviceInfo(): Promise<JsAny?>
+    fun createStartUpPageContainer(container: JsAny?): Promise<JsAny?>
+    fun rebuildPageContainer(container: JsAny?): Promise<JsAny?>
+    fun updateImageRawData(data: JsAny?): Promise<JsAny?>
+    fun textContainerUpgrade(container: JsAny?): Promise<JsAny?>
+    fun audioControl(isOpen: Boolean): Promise<JsAny?>
+    fun imuControl(isOpen: Boolean, reportFrq: Int = definedExternally): Promise<JsAny?>
+    fun shutDownPageContainer(exitMode: Int = definedExternally): Promise<JsAny?>
     fun onDeviceStatusChanged(callback: (status: JsAny?) -> Unit): () -> Unit
     fun onEvenHubEvent(callback: (event: JsAny?) -> Unit): () -> Unit
     fun onLaunchSource(callback: (source: String) -> Unit): () -> Unit
