@@ -5,6 +5,7 @@ package com.fzfstudio.eh.innovel.sdk
 import kotlinx.coroutines.await
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
+import kotlin.js.jsTypeOf
 
 /**
  * even_hub_sdk 的 Kotlin/JS 实现（actual）。
@@ -87,3 +88,8 @@ actual fun observeLaunchSource(onChange: (LaunchSource) -> Unit): () -> Unit =
     EvenAppBridge.getInstance().onLaunchSource { source ->
         onChange(LaunchSource.fromString(source))
     }
+
+actual fun getEvenHubAppId(): String? {
+    val value = js("typeof window !== 'undefined' ? window.__EVEN_HUB_APP_ID__ : undefined")
+    return if (jsTypeOf(value) == "undefined" || value == null) null else value.toString()
+}

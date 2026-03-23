@@ -103,3 +103,8 @@ expect fun observeEvenHubEvent(onChange: (EvenHubEvent?) -> Unit): () -> Unit
  * @return 取消监听的函数
  */
 expect fun observeLaunchSource(onChange: (LaunchSource) -> Unit): () -> Unit
+
+/**
+ * 读取 SDK 暴露在 `window` 上的 appId。
+ */
+expect fun getEvenHubAppId(): String?

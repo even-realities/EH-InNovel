@@ -91,6 +91,11 @@ actual fun observeLaunchSource(onChange: (LaunchSource) -> Unit): () -> Unit =
         onChange(launchSourceFromJs(source))
     }
 
+actual fun getEvenHubAppId(): String? = getEvenHubAppIdImpl()
+
+@JsFun("() => (typeof window !== 'undefined' && window.__EVEN_HUB_APP_ID__ !== undefined) ? String(window.__EVEN_HUB_APP_ID__) : null")
+private external fun getEvenHubAppIdImpl(): String?
+
 // Promise -> suspend adapter for wasm.
 private suspend fun <T : JsAny?> Promise<T>.awaitWasm(): T = suspendCancellableCoroutine { cont ->
     this.then(

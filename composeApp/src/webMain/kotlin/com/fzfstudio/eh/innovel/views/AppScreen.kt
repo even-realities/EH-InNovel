@@ -22,6 +22,7 @@ import com.fzfstudio.eh.innovel.models.AppUiState
 import com.fzfstudio.eh.innovel.models.BookModel
 import com.fzfstudio.eh.innovel.sdk.LaunchSource
 import com.fzfstudio.eh.innovel.sdk.ShutDownContainer
+import com.fzfstudio.eh.innovel.sdk.getEvenHubAppId
 import com.fzfstudio.eh.innovel.sdk.shutDownPageContainer
 import kotlinx.coroutines.launch
 
@@ -44,6 +45,7 @@ fun AppScreen(
         LaunchSource.AppMenu -> "应用通过 AppMenu 打开"
         null -> "应用启动来源待确认"
     }
+    val appIdText = getEvenHubAppId() ?: "无"
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -54,7 +56,7 @@ fun AppScreen(
         Row(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(text = launchSourceText)
+            Text(text = "$launchSourceText，appId: $appIdText")
         }
         Row(
             modifier = Modifier
@@ -106,6 +108,7 @@ fun AppScreen(
             TextImageView()
             TextAudioView(displayLines = uiState.audioEventDisplayLines)
             TextImuView(displayLines = uiState.imuEventDisplayLines)
+            SystemPermissionView()
         }
 
         Spacer(modifier = Modifier.height(24.dp))
