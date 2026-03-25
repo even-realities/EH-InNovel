@@ -166,7 +166,17 @@ class AppState {
                     }
                     event.sysEvent != null -> {
                         val sysEvent = event.sysEvent
-                        println("[EvenHubEvent] SysItemEvent - EventType: ${sysEvent.eventType}")
+                        println(
+                            "[EvenHubEvent] SysItemEvent - " +
+                                "EventType: ${sysEvent.eventType}, " +
+                                "EventSource: ${sysEvent.eventSource}, " +
+                                "ImuData: { " +
+                                "x: ${sysEvent.imuData?.x}, " +
+                                "y: ${sysEvent.imuData?.y}, " +
+                                "z: ${sysEvent.imuData?.z} " +
+                                "}, " +
+                                "SystemExitReasonCode: ${sysEvent.systemExitReasonCode}"
+                        )
                         handleSysItemEvent(sysEvent)
                     }
                     event.audioEvent != null -> {

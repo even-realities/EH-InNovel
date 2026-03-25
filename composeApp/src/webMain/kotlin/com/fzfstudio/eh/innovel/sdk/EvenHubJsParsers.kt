@@ -241,6 +241,13 @@ internal fun sysItemEventFromJs(raw: JsAny?): SysItemEvent? {
 
     val eventType = osEventTypeListFromJs(eventTypeRaw)
 
+    val eventSourceRaw = JsInteropUtils.getProperty(raw, "eventSource")
+        ?: JsInteropUtils.getProperty(raw, "EventSource")
+        ?: JsInteropUtils.getProperty(raw, "EventSourceType")
+        ?: JsInteropUtils.getProperty(raw, "EventSource_Type")
+
+    val eventSource = eventSourceTypeFromJs(eventSourceRaw)
+
     val imuRaw = JsInteropUtils.getProperty(raw, "imuData")
         ?: JsInteropUtils.getProperty(raw, "IMUData")
         ?: JsInteropUtils.getProperty(raw, "IMU_Data")
@@ -248,10 +255,25 @@ internal fun sysItemEventFromJs(raw: JsAny?): SysItemEvent? {
 
     val imuData = imuReportDataFromJs(imuRaw)
 
+    val systemExitReasonCode = JsInteropUtils.getIntProperty(raw, "systemExitReasonCode")
+        ?: JsInteropUtils.getIntProperty(raw, "SystemExitReasonCode")
+
     return SysItemEvent(
         eventType = eventType,
+        eventSource = eventSource,
         imuData = imuData,
+        systemExitReasonCode = systemExitReasonCode,
     )
+}
+
+internal fun eventSourceTypeFromJs(raw: JsAny?): EventSourceType? {
+    if (raw == null) return null
+    JsInteropUtils.toIntOrNull(raw)?.let { return EventSourceType.fromInt(it) }
+    JsInteropUtils.toStringOrNull(raw)?.let { return EventSourceType.fromString(it) }
+    JsInteropUtils.getIntProperty(raw, "index")?.let { return EventSourceType.fromInt(it) }
+    JsInteropUtils.getIntProperty(raw, "value")?.let { return EventSourceType.fromInt(it) }
+    JsInteropUtils.getStringProperty(raw, "name")?.let { return EventSourceType.fromString(it) }
+    return null
 }
 
 /**

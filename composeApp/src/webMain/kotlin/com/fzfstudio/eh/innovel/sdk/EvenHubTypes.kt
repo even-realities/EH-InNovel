@@ -144,6 +144,39 @@ enum class OsEventTypeList(val value: Int) {
 }
 
 /**
+ * 系统事件来源枚举。
+ */
+enum class EventSourceType(val value: Int) {
+    TOUCH_EVENT_FORM_DUMMY_NULL(0),
+    TOUCH_EVENT_FROM_GLASSES_R(1),
+    TOUCH_EVENT_FROM_RING(2),
+    TOUCH_EVENT_FROM_GLASSES_L(3);
+
+    companion object {
+        fun fromInt(value: Int?): EventSourceType? {
+            return values().find { it.value == value }
+        }
+
+        fun fromString(value: String?): EventSourceType? {
+            if (value == null) return null
+            val upper = value.trim().uppercase()
+            return when (upper) {
+                "TOUCH_EVENT_FORM_DUMMY_NULL",
+                "TOUCH_EVENT_FROM_DUMMY_NULL",
+                "DUMMY_NULL" -> TOUCH_EVENT_FORM_DUMMY_NULL
+                "TOUCH_EVENT_FROM_GLASSES_R",
+                "GLASSES_R" -> TOUCH_EVENT_FROM_GLASSES_R
+                "TOUCH_EVENT_FROM_RING",
+                "RING" -> TOUCH_EVENT_FROM_RING
+                "TOUCH_EVENT_FROM_GLASSES_L",
+                "GLASSES_L" -> TOUCH_EVENT_FROM_GLASSES_L
+                else -> null
+            }
+        }
+    }
+}
+
+/**
  * IMU 上报快慢档位，与 `@evenrealities/even_hub_sdk` 的 `ImuReportPace` 一致（100～1000，步进 100）。
  */
 enum class ImuReportPace(val value: Int) {
@@ -246,8 +279,12 @@ data class TextItemEvent(
 data class SysItemEvent(
     /** 事件类型 */
     val eventType: OsEventTypeList? = null,
+    /** 事件来源 */
+    val eventSource: EventSourceType? = null,
     /** IMU 数据（开启 IMU 上报时由宿主填充） */
     val imuData: ImuReportData? = null,
+    /** 系统退出原因码 */
+    val systemExitReasonCode: Int? = null,
 )
 
 /**
